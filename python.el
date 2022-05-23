@@ -362,6 +362,8 @@ This variant of `rx' supports common Python named REGEXPS."
   `(rx-let ((block-start       (seq symbol-start
                                     (or "def" "class" "if" "elif" "else" "try"
                                         "except" "finally" "for" "while" "with"
+                                        ;; Python 3.10+ PEP634
+                                        "match" "case"
                                         ;; Python 3.5+ PEP492
                                         (and "async" (+ space)
                                              (or "def" "for" "with")))
@@ -538,9 +540,9 @@ the {...} holes that appear within f-strings."
         (setq ppss (syntax-ppss))))))
 
 (defvar python-font-lock-keywords-level-1
-  `((,(rx symbol-start "def" (1+ space) (group (1+ (or word ?_))))
+  `((,(python-rx symbol-start "def" (1+ space) (group symbol-name))
      (1 font-lock-function-name-face))
-    (,(rx symbol-start "class" (1+ space) (group (1+ (or word ?_))))
+    (,(python-rx symbol-start "class" (1+ space) (group symbol-name))
      (1 font-lock-type-face)))
   "Font lock keywords to use in `python-mode' for level 1 decoration.
 
@@ -676,7 +678,7 @@ sign in chained assignment."
     ;; and variants thereof
     ;; the cases
     ;;   (a) = 5
-    ;;   [a] = 5
+    ;;   [a] = 5,
     ;;   [*a] = 5, 6
     ;; are handled separately below
     (,(python-font-lock-assignment-matcher
@@ -706,7 +708,7 @@ sign in chained assignment."
      (1 font-lock-variable-name-face))
     ;; special cases
     ;;   (a) = 5
-    ;;   [a] = 5
+    ;;   [a] = 5,
     ;;   [*a] = 5, 6
     (,(python-font-lock-assignment-matcher
        (python-rx (or line-start ?\; ?=) (* space)
