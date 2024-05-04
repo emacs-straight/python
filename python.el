@@ -2860,7 +2860,7 @@ virtualenv."
   :type '(repeat symbol))
 
 (defcustom python-shell-compilation-regexp-alist
-  `((,(rx line-start (1+ (any " \t")) "File \""
+  `((,(rx line-start (1+ (any " \t")) (? ?| (1+ (any " \t"))) "File \""
           (group (1+ (not (any "\"<")))) ; avoid `<stdin>' &c
           "\", line " (group (1+ digit)))
      1 2)
@@ -2871,7 +2871,8 @@ virtualenv."
           "(" (group (1+ digit)) ")" (1+ (not (any "("))) "()")
      1 2))
   "`compilation-error-regexp-alist' for inferior Python."
-  :type '(alist regexp))
+  :type '(alist regexp)
+  :version "30.1")
 
 (defcustom python-shell-dedicated nil
   "Whether to make Python shells dedicated by default.
