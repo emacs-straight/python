@@ -1,2 +1,2 @@
-;; Generated package description from python.el  -*- no-byte-compile: t -*-
-(define-package "python" "0.28.0.20250204.222800" "Python's flying circus support for Emacs" '((emacs "24.4") (compat "29.1.1.0") (seq "2.23")) :commit "a476295620a692657f7febd4630cf67f128c4c65" :authors '(("Fabián E. Gallina" . "fgallina@gnu.org")) :maintainer '(nil . "emacs-devel@gnu.org") :keywords '("languages") :url "https://github.com/fgallina/python.el")
+;; Generated package description from python.el  -*- mode: lisp-data; no-byte-compile: t -*-
+(define-package "python" "0.28.0.20250215.112459" "Python's flying circus support for Emacs" '((emacs "24.4") (compat "29.1.1.0") (seq "2.23")) :commit "4cf53c436159ea54dbfe1a1e24515e2e6fbf9a6f" :authors '(("Fabián E. Gallina" . "fgallina@gnu.org")) :maintainer '(nil . "emacs-devel@gnu.org") :keywords '("languages") :url "https://github.com/fgallina/python.el")
