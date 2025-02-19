@@ -2930,6 +2930,7 @@ virtualenv related vars."
   (let* ((virtualenv (when python-shell-virtualenv-root
                        (directory-file-name python-shell-virtualenv-root)))
          (res python-shell-process-environment))
+    (push "PYTHON_BASIC_REPL=1" res)
     (when python-shell-unbuffered
       (push "PYTHONUNBUFFERED=1" res))
     (when python-shell-extra-pythonpaths
@@ -4537,6 +4538,13 @@ def __PYTHON_EL_native_completion_setup():
             if not is_ipython:
                 readline.set_completer(new_completer)
             else:
+                # Ensure that rlcompleter.__main__ and __main__ are identical.
+                # (Bug#76205)
+                import sys
+                try:
+                    sys.modules['rlcompleter'].__main__ = sys.modules['__main__']
+                except KeyError:
+                    pass
                 # Try both initializations to cope with all IPython versions.
                 # This works fine for IPython 3.x but not for earlier:
                 readline.set_completer(new_completer)
