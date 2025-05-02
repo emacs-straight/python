@@ -269,6 +269,11 @@
 (declare-function treesit-node-parent "treesit.c")
 (declare-function treesit-node-prev-sibling "treesit.c")
 
+(add-to-list
+ 'treesit-language-source-alist
+ '(python "https://github.com/tree-sitter/tree-sitter-python" "v0.23.6")
+ t)
+
 ;; Avoid compiler warnings
 (defvar compilation-error-regexp-alist)
 (defvar outline-heading-end-regexp)
@@ -1230,7 +1235,15 @@ fontified."
       name: (identifier) @font-lock-type-face)
      (parameters (identifier) @font-lock-variable-name-face)
      (parameters (typed_parameter (identifier) @font-lock-variable-name-face))
-     (parameters (default_parameter name: (identifier) @font-lock-variable-name-face)))
+     (parameters (default_parameter name: (identifier) @font-lock-variable-name-face))
+     (lambda_parameters (identifier) @font-lock-variable-name-face)
+     (for_in_clause
+      left: (identifier) @font-lock-variable-name-face)
+     ((import_from_statement
+       name: ((dotted_name (identifier) @font-lock-type-face)))
+      (:match "\\`[A-Z][A-Za-z0-9]+\\'" @font-lock-type-face))
+     (import_from_statement
+      name: ((dotted_name (identifier) @font-lock-variable-name-face))))
 
    :feature 'builtin
    :language 'python
@@ -1259,7 +1272,12 @@ fontified."
 
    :feature 'constant
    :language 'python
-   '([(true) (false) (none)] @font-lock-constant-face)
+   '([(true) (false) (none)] @font-lock-constant-face
+     ((identifier) @font-lock-constant-face
+      (:match "\\`[A-Z][A-Z0-9_]+\\'" @font-lock-constant-face))
+     ((attribute
+       attribute: (identifier) @font-lock-constant-face)
+      (:match "\\`[A-Z][A-Z0-9_]+\\'" @font-lock-constant-face)))
 
    :feature 'assignment
    :language 'python
@@ -1287,8 +1305,6 @@ fontified."
 
    :feature 'type
    :language 'python
-   ;; Override built-in faces when dict/list are used for type hints.
-   :override t
    `(((identifier) @font-lock-type-face
       (:match ,(rx-to-string
                 `(seq bol (or ,@python--treesit-exceptions)
@@ -1333,7 +1349,9 @@ fontified."
      ((call function: (identifier) @func-name
             (argument_list :anchor (_)
                            (binary_operator) @python--treesit-fontify-union-types-strict))
-      (:match "^is\\(?:instance\\|subclass\\)$" @func-name)))
+      (:match "^is\\(?:instance\\|subclass\\)$" @func-name))
+     ((identifier) @font-lock-type-face
+      (:match "\\`[A-Z][A-Za-z0-9]+\\'" @font-lock-type-face)))
 
    :feature 'escape-sequence
    :language 'python
@@ -7294,7 +7312,9 @@ implementations: `python-mode' and `python-ts-mode'."
 
 \\{python-ts-mode-map}"
   :syntax-table python-mode-syntax-table
-  (when (treesit-ready-p 'python)
+  (when (if (fboundp 'treesit-ensure-installed) ; Emacs 31
+            (treesit-ensure-installed 'python)
+          (treesit-ready-p 'python))
     (setq treesit-primary-parser (treesit-parser-create 'python))
     (setq-local treesit-font-lock-feature-list
                 '(( comment definition)
