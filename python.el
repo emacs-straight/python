@@ -267,7 +267,9 @@
 (declare-function treesit-node-start "treesit.c")
 (declare-function treesit-node-end "treesit.c")
 (declare-function treesit-node-parent "treesit.c")
+(declare-function treesit-node-child "treesit.c")
 (declare-function treesit-node-prev-sibling "treesit.c")
+(declare-function treesit-node-field-name-for-child "treesit.c")
 
 (add-to-list
  'treesit-language-source-alist
@@ -1122,12 +1124,13 @@ fontified."
                                        "body"))
                        (throw 'break 'font-lock-doc-face))
 
-                     (let ((idx 0))
-                       (while (< idx cursor-idx)
-                         (unless (equal (treesit-node-type
-                                         (treesit-node-child parent idx))
-                                        "comment")
-                           (throw 'break 'font-lock-string-face))))
+                     ;; If there's any non-comment sibling before
+                     ;; cursor, the string isn't a docstring.
+                     (dotimes (idx cursor-idx)
+                       (unless (equal (treesit-node-type
+                                       (treesit-node-child parent idx))
+                                      "comment")
+                         (throw 'break 'font-lock-string-face)))
                      (setq cursor parent)))))
          (ignore-interpolation
           (not (seq-some
