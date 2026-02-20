@@ -1,2 +1,2 @@
-;; Generated package description from python.el  -*- mode: lisp-data; no-byte-compile: t -*-
-(define-package "python" "0.30.0.20260207.124427" "Python's flying circus support for Emacs" '((emacs "29.1") (compat "29.1.1.0") (seq "2.23") (project "0.1") (flymake "1.0")) :commit "e0ce881be92f0cf26723c3714a3903a088912906" :authors '(("Fabián E. Gallina" . "fgallina@gnu.org")) :maintainer '(nil . "emacs-devel@gnu.org") :keywords '("languages") :url "https://github.com/fgallina/python.el")
+;; Generated package description from python.el  -*- mode: lisp-data; no-byte-compile: t; lexical-binding:t -*-
+(define-package "python" "0.30.0.20260219.173652" "Python's flying circus support for Emacs" '((emacs "29.1") (compat "29.1.1.0")) :commit "71d7ea23dbccd93888021ba0dfc3a392ef36f624" :authors '(("Fabián E. Gallina" . "fgallina@gnu.org")) :maintainer '(nil . "emacs-devel@gnu.org") :keywords '("languages") :url "https://github.com/fgallina/python.el")

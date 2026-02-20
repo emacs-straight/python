@@ -6,7 +6,7 @@
 ;; Maintainer: emacs-devel@gnu.org
 ;; URL: https://github.com/fgallina/python.el
 ;; Version: 0.30
-;; Package-Requires: ((emacs "29.1") (compat "29.1.1.0") (seq "2.23") (project "0.1") (flymake "1.0"))
+;; Package-Requires: ((emacs "29.1") (compat "29.1.1.0"))
 ;; Created: Jul 2010
 ;; Keywords: languages
 
@@ -257,7 +257,7 @@
 (require 'treesit)
 (require 'pcase)
 (require 'compat)
-(require 'project nil 'noerror)
+(require 'project)
 (require 'seq)
 
 (declare-function treesit-parser-create "treesit.c")
@@ -3366,16 +3366,6 @@ from `python-shell-prompt-regexp',
             python-shell--prompt-calculated-output-regexp
             (funcall build-regexp output-prompts)))))
 
-(defun python-shell-get-project-name ()
-  "Return the project name for the current buffer.
-Use `project-name-cached' if available."
-  (when (featurep 'project)
-    (if (fboundp 'project-name-cached)
-        (project-name-cached default-directory)
-      (when-let* ((proj (project-current)))
-        (file-name-nondirectory
-         (directory-file-name (project-root proj)))))))
-
 (defun python-shell-get-process-name (dedicated)
   "Calculate the appropriate process name for inferior Python process.
 If DEDICATED is nil, this is simply `python-shell-buffer-name'.
@@ -3384,8 +3374,8 @@ name respectively the current project name."
   (pcase dedicated
     ('nil python-shell-buffer-name)
     ('project
-     (if-let* ((proj-name (python-shell-get-project-name)))
-         (format "%s[%s]" python-shell-buffer-name proj-name)
+     (if-let* ((proj (project-current)))
+         (format "%s[%s]" python-shell-buffer-name (project-name proj))
        python-shell-buffer-name))
     (_ (format "%s[%s]" python-shell-buffer-name (buffer-name)))))
 
@@ -3894,7 +3884,6 @@ process buffer for a list of commands.)"
            python-shell-dedicated
            t)))
   (let* ((project (and (eq 'project dedicated)
-                       (featurep 'project)
                        (project-current t)))
          (default-directory (if project
                                 (project-root project)
@@ -7063,8 +7052,7 @@ for key in sorted(result):
 
 (defun python--import-sources ()
   "List files containing Python imports that may be useful in the current buffer."
-  (if-let* (((featurep 'project))        ;For compatibility with Emacs < 26
-            (proj (project-current)))
+  (if-let* ((proj (project-current)))
       (seq-filter (lambda (s) (string-match-p "\\.py[iwx]?\\'" s))
                   (project-files proj))
     (list default-directory)))
